@@ -1,0 +1,6 @@
+test/
+ideas*
+
+**/.env
+ansible/inventory/hosts.ini
+
