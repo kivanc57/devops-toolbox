@@ -1,0 +1,11 @@
+[Unit]
+Description=weekly backup at 8 PM
+
+[Timer]
+OnCalendar=Mon *-*-* 20:00:00
+Persistent=True
+Unit=partition-backup.service
+
+[Install]
+WantedBy=multi-user.target
+

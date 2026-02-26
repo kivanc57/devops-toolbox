@@ -1,0 +1,11 @@
+[Unit]
+Description=monthly backup on the 15th at 10 PM
+
+[Timer]
+OnCalendar=*-*-15 22:00:00
+Persistent=true
+Unit=disk-backup.service
+
+[Install]
+WantedBy=multi-user.target
+

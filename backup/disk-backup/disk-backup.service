@@ -1,0 +1,6 @@
+[Unit]
+Description=archive root and send to server
+
+[Service]
+ExecStart=/usr/local/bin/disk-backup.sh
+
