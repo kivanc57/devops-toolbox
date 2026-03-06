@@ -1,0 +1,7 @@
+go/
+serial.log
+Public/
+Templates/
+VMs/
+.*
+

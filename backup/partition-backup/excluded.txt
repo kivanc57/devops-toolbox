@@ -1,0 +1,9 @@
+/var/cache
+/var/tmp
+/var/run
+/var/lock
+/var/lib/pacman/sync
+/usr/src
+/usr/local/src
+/usr/local/tmp
+

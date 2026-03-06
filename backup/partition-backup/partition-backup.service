@@ -1,0 +1,6 @@
+[Unit]
+Description=archive partitions and send to server
+
+[Service]
+ExecStart=/usr/local/bin/partition-backup.sh
+

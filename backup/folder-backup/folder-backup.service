@@ -1,0 +1,6 @@
+[Unit]
+Description=rsync local folder with server
+
+[Service]
+ExecStart=/usr/local/bin/folder-backup.sh
+
