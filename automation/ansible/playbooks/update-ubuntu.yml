@@ -1,0 +1,25 @@
+- name: Full system upgrade (Ubuntu)
+  hosts: all
+  gather_facts: false               # 'true' if using facts and/or dif os
+  become: true                      # grants sudo priveleges
+  vars_files:                       # declare vault path if vault required
+    - ../secrets/become.vault.yml
+
+  tasks:
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Perform dist upgrade
+      ansible.builtin.apt:
+        upgrade: dist
+
+    - name: Remove unused packages
+      ansible.builtin.apt:
+        autoremove: yes
+
+    - name: Remove useless dependencies
+      ansible.builtin.apt:
+        autoclean: yes
+
