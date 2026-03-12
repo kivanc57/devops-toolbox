@@ -1,0 +1,6 @@
+[Unit]
+Description=perform an integrity test of Tripware and send it to email
+
+[Service]
+ExecStart=/usr/local/bin/exec-tripwire.sh
+

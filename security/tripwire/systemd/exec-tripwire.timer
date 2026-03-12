@@ -1,0 +1,11 @@
+[Unit]
+Description=execute tripwire daily at 7PM
+
+[Timer]
+OnCalendar=daily
+Persistent=True
+Unit=exec-tripwire.service
+
+[Install]
+WantedBy=multi-user.target
+
