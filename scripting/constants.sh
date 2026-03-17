@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-# script consonants
+# script constants
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SCRIPT_NAME="$(basename "${BASH_SOURCE[0]}")"
 
