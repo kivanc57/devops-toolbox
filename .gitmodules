@@ -1,0 +1,3 @@
+[submodule "aws-cli"]
+	path = aws-cli
+	url = git@github.com:kivanc57/aws-cli.git
