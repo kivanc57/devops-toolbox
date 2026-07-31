@@ -2,20 +2,51 @@
 set -euo pipefail
 
 TEMP="${HOME}/tmp"
-MEDIAWIKI_ARCH="mediawiki-1.45.1.tar.gz"
-SERVER_ROOT=$(awk '/DocumentRoot/ {print $2}' /etc/apache2/sites-available/000-default.conf)
+MEDIAWIKI_VERSION="1.45.4"
+MEDIAWIKI_ARCH="mediawiki-${MEDIAWIKI_VERSION}.tar.gz"
+MEDIAWIKI_URL="https://releases.wikimedia.org/mediawiki/1.45/${MEDIAWIKI_ARCH}"
 
-mkdir -p "${TEMP}"
+DOCUMENT_ROOT="${1:?DOCUMENT_ROOT argument not provided}"
 
-wget "https://releases.wikimedia.org/mediawiki/1.45/${MEDIAWIKI_ARCH}" -O \
-    "${TEMP}/${MEDIAWIKI_ARCH}"
+ARCHIVE="${TEMP}/${MEDIAWIKI_ARCH}"
+STAGING="${TEMP}/mediawiki-${MEDIAWIKI_VERSION}"
 
-sudo tar xvf "${TEMP}/${MEDIAWIKI_ARCH}" -C "${SERVER_ROOT}" \
+mkdir -p "$TEMP"
+
+# Remove any previous incomplete download/staging directory
+rm -f "$ARCHIVE"
+rm -rf "$STAGING"
+
+printf 'Downloading MediaWiki %s...\n' "$MEDIAWIKI_VERSION"
+
+curl \
+    --fail \
+    --location \
+    --retry 10 \
+    --retry-delay 2 \
+    --retry-all-errors \
+    --continue-at - \
+    --output "$ARCHIVE" \
+    "$MEDIAWIKI_URL"
+
+# Extract to staging first
+mkdir -p "$STAGING"
+
+tar xzf "$ARCHIVE" -C "$STAGING" \
     --strip-components=1
 
-sudo chown -R www-data:www-data "${SERVER_ROOT}"
+# Basic sanity checks before touching Apache's DocumentRoot
+test -f "$STAGING/index.php"
+test -d "$STAGING/includes"
+test -d "$STAGING/vendor"
 
-sudo systemctl restart apache2
+printf 'Installing into %s...\n' "$DOCUMENT_ROOT"
 
-rm -f "${TEMP}/${MEDIAWIKI_ARCH}"
+sudo mkdir -p "$DOCUMENT_ROOT"
 
+sudo cp -a "$STAGING"/. "$DOCUMENT_ROOT"/
+
+rm -rf "$STAGING"
+rm -f "$ARCHIVE"
+
+printf 'MediaWiki %s installed successfully.\n' "$MEDIAWIKI_VERSION"

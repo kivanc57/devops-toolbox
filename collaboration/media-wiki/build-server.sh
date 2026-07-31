@@ -1,44 +1,41 @@
 #!/bin/bash
 set -euo pipefail
 
-# use ip of host to connect on browser at client
-# DocumentRoot -> /etc/apache2/sites-available/000-default.conf
-# defualt server root -> /var/www/html
-# http://192.168.122.90/mw-config/index.php
-
-source .env
+source ".env"
+source "/etc/os-release"
 
 : "${DB_NAME:?DB_NAME not set}"
 : "${USERNAME:?USERNAME not set}"
 : "${PASSWORD:?PASSWORD not set}"
 
-export DB_NAME
-export USERNAME
-export PASSWORD
+export DB_NAME USERNAME PASSWORD
 
-sudo apt-get update
+if [ "$ID" = "ubuntu" ]; then
+    "./deps/ubuntu.sh"
+    APACHE_CONFIG="/etc/apache2/sites-available/000-default.conf"
+    SERVICE="apache2"
+   
+elif [ "$ID" = "fedora" ]; then
+    "./deps/fedora.sh"
+    APACHE_CONFIG="/etc/httpd/conf/httpd.conf"
+    SERVICE="httpd"
+fi
 
-# install mariadb first to avoid conflicts with mysql
-sudo apt-get install mariadb-server -y
-sudo systemctl start mariadb
-sudo systemctl enable mariadb
+DOCUMENT_ROOT="$(
+    awk '$1 == "DocumentRoot" {
+        gsub(/"/, "", $2)
+        print $2
+        exit
+    }' "$APACHE_CONFIG"
+)"
 
-sudo apt-get install -y \
-    lamp-server^ \
-    libapache2-mod-php \
-    php \
-    php-mysql \
-    php-apcu \
-    php-imagick \
-    php8.3-mbstring \
-    php8.3-xml \
-    php8.3-intl \
-    php8.3-gd
+printf 'Apache config: %s\n' "$APACHE_CONFIG"
+printf 'Document root: %s\n' "$DOCUMENT_ROOT"
 
-# execute custom scripts
-"./harden-server.sh"    #or mysql_secure_installation interactively
+"./harden-server.sh"
+"./build-db.sh"
+"./build-mediawiki.sh" "$DOCUMENT_ROOT"
 
-"/.build-db.sh"
-
-"/.build-mediawiki.sh"
+sudo chown -R apache:apache "${DOCUMENT_ROOT}"
+sudo systemctl restart "$SERVICE"
 
