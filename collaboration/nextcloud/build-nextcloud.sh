@@ -1,23 +1,57 @@
 #!/bin/bash
 set -euo pipefail
 
-sudo apt-get update
-sudo apt-get install bzip2 -y
-
 TEMP="${HOME}/tmp"
-NEXTCLOUD_ARCH="nextcloud-32.0.5.tar.bz2"
-SERVER_ROOT=$(awk '/DocumentRoot/ {print $2}' /etc/apache2/sites-available/000-default.conf)
+NEXTCLOUD_VERSION="34.0.2"
+NEXTCLOUD_ARCH="nextcloud-${NEXTCLOUD_VERSION}.tar.bz2"
+NEXTCLOUD_URL="https://download.nextcloud.com/server/releases/${NEXTCLOUD_ARCH}" 
 
-sudo mkdir -p "${TEMP}"
+DOCUMENT_ROOT="${1:?DOCUMENT_ROOT argument not provided}"
 
-wget "https://download.nextcloud.com/server/releases/${NEXTCLOUD_ARCH}" -O \
-    "${TEMP}/${NEXTCLOUD_ARCH}"
+ARCHIVE="${TEMP}/${NEXTCLOUD_ARCH}"
+STAGING="${TEMP}/nextcloud-${NEXTCLOUD_VERSION}"
 
-sudo tar xvf "${TEMP}/${NEXTCLOUD_ARCH}" -C "${SERVER_ROOT}"
+mkdir -p "$TEMP"
 
-sudo chown -R www-data:www-data "${SERVER_ROOT}/nextcloud"
+rm -rf "$STAGING"
 
-sudo systemctl restart apache2
+printf 'Downloading Nextcloud %s...\n' "${NEXTCLOUD_VERSION}"
 
-rm -f "${TEMP}/${NEXTCLOUD_ARCH}"
+curl \
+    --fail \
+    --location \
+    --retry 10 \
+    --retry-delay 2 \
+    --retry-all-errors \
+    --continue-at - \
+    --output "${ARCHIVE}" \
+    "${NEXTCLOUD_URL}"
+
+printf 'Validating archive...\n'
+
+bzip2 -t "$ARCHIVE"
+tar tf "$ARCHIVE" >/dev/null
+
+printf 'Extracting to staging...\n'
+
+mkdir -p "$STAGING"
+
+tar xf "$ARCHIVE" \
+    -C "$STAGING" \
+    --strip-components=1
+
+# Sanity checks
+test -f "$STAGING/index.php"
+test -d "$STAGING/core"
+test -d "$STAGING/lib"
+
+printf 'Installing into %s...\n' "$DOCUMENT_ROOT"
+
+sudo mkdir -p "$DOCUMENT_ROOT"
+sudo cp -a "$STAGING"/. "$DOCUMENT_ROOT"/
+
+rm -rf "$STAGING"
+rm -f "$ARCHIVE"
+
+printf 'MediaWiki %s installed successfully.\n' "${NEXTCLOUD_VERSION}"
 

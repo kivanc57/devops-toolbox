@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-sudo mysql -e "
+sudo mariadb -e "
 ALTER USER 'root'@'localhost' IDENTIFIED VIA unix_socket;
 DROP USER IF EXISTS ''@'$(hostname)';
 DROP USER IF EXISTS 'root'@'%';
