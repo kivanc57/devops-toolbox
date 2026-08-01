@@ -20,7 +20,7 @@ sudo firewall-cmd --permanent --add-service=https
 
 sudo firewall-cmd --permanent --remove-service=ssh
 
-sudo firewall-cmd --permanent --add-rich-rule="rule family=${RULE_FAMILY} source address=${IP} port port=${PORT} protocol=${PROTOCOL} accept"
+sudo firewall-cmd --permanent --add-rich-rule="rule family=${RULE_FAMILY} source address=${IP} port protocol=${PROTOCOL} port=${PORT} accept"
 
 sudo firewall-cmd --reload
 sudo firewall-cmd --list-all 
