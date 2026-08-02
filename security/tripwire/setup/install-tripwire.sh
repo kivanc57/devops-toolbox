@@ -11,10 +11,8 @@ export SITE_PASSWORD
 export LOCAL_PASSWORD
 export GLOBALEMAIL
 
-"./seed-tripwire.sh"
-
-sudo apt-get update -y
-sudo DEBIAN_FRONTEND=noninteractive apt-get install -y postfix tripwire
+sudo dnf update -y
+sudo dnf install tripwire -y
 
 "./setup-postfix.sh"
 

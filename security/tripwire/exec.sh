@@ -21,7 +21,7 @@ sudo tripwire -m c \
     --email-report-level 1
 
 # assign latest report to a var
-REPORT_LATEST="$(ls -t ${REPORT_DIR}/*.twr | head -n1)"
+REPORT_LATEST="$(sudo ls -t ${REPORT_DIR}/*.twr | head -n1)"
 
 # decode latest report
 sudo twprint -m r \

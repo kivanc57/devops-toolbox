@@ -1,6 +1,8 @@
 #!/bin/bash
 set -euo pipefail
 
+source "$(dirname "$0")/.env"
+
 # Recovery commands for twcfg.txt & twpol.txt values
 # In order to retrieve default values and edit them
 #
@@ -12,7 +14,7 @@ TWCFG_DIR="${TW_DIR}/twcfg.txt"
 TWPOL_DIR="${TW_DIR}/twpol.txt"
 
 SITE_KEY="${TW_DIR}/site.key"
-LOCAL_KEY="${TW_DIR}/$(hostname -s)-local.key"
+LOCAL_KEY="${TW_DIR}/$(hostname)-local.key"
 
 # add user mail
 echo "GLOBALEMAIL =${GLOBALEMAIL}" | sudo tee -a "${TWCFG_DIR}" &>/dev/null
@@ -31,6 +33,11 @@ sudo twadmin --generate-keys \
 sudo twadmin --create-cfgfile \
   --site-keyfile "${SITE_KEY}" \
   --site-passphrase "${SITE_PASSWORD}" \
+  "${TWCFG_DIR}"
+
+# LOOSEDIRECTORYCHECKING=true for flexible checking
+sudo sed -Ei \
+  's|^[[:space:]]*LOOSEDIRECTORYCHECKING[[:space:]]*=.*$|LOOSEDIRECTORYCHECKING =true|' \
   "${TWCFG_DIR}"
 
 # create tw.pol (encrypted)
