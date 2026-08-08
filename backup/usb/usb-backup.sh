@@ -1,13 +1,9 @@
 #!/bin/bash
 set -euo pipefail
 
-destination="/run/media/kivanc57/USB"
+mount_path="/run/media/kivanc57/USB"
+device_path="/dev/sda"
 sources=("$@")
-
-if (( $# == 0 )); then
-    echo "Usage: $0 SOURCE [SOURCE ...]" >&2
-    exit 1
-fi
 
 options=(
     -ah
@@ -21,8 +17,14 @@ options=(
     --exclude=$'*\n*'
 )
 
-rsync    "${options[@]}" "${sources[@]}" "$destination"
+# mount USB
+udiskctl mount -b "${mount_path}1"
+
+# backup files -> USB & sync
+rsync    "${options[@]}" "${sources[@]}" "${mount_path}"
 sync
-udisksctl unmount -b /dev/sda1
-udisksctl power-off -b /dev/sda
+
+# unmount & power off before ejection
+udisksctl unmount -b "${device_path}1"
+udisksctl power-off -b "${device_path}"
 
