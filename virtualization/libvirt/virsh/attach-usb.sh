@@ -12,7 +12,7 @@ VENDOR_ID="0x058f"
 PRODUCT_ID="0x6387"
 
 # unmount usb from host
-sudo umount /run/media/kivanc57/USB
+sudo umount /run/media/kivanc57/USB || true
 
 # write config
 cat > "${USB_CONFIG}" <<EOF
@@ -25,5 +25,7 @@ cat > "${USB_CONFIG}" <<EOF
 EOF
 
 # attach usb as config
-sudo virsh attach-device "${VM_NAME}" "${USB_CONFIG}" --live
+sudo virsh attach-device "${VM_NAME}" "${USB_CONFIG}" --persistent
 
+# detach usb as config
+# sudo virsh detach-device "${VM_NAME}" "${USB_CONFIG}" --persistent
