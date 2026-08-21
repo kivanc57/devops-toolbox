@@ -2,5 +2,5 @@
 Description=archive partitions and send to server
 
 [Service]
-ExecStart=/usr/local/bin/partition-backup.sh
+ExecStart=/usr/local/bin/backup-partition.sh
 

@@ -2,5 +2,5 @@
 Description=archive root and send to server
 
 [Service]
-ExecStart=/usr/local/bin/disk-backup.sh
+ExecStart=/usr/local/bin/backup-disk.sh
 

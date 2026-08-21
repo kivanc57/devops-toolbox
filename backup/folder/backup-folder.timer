@@ -4,7 +4,7 @@ Description=daily rsync at 12 PM
 [Timer]
 OnCalendar=Mon..Sun *-*-* 12:00:00
 Persistent=True
-Unit=folder-backup.service
+Unit=backup-folder.service
 
 [Install]
 WantedBy=multi-user.target
